@@ -3,6 +3,7 @@ from app.models import Vaga
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, time, timedelta
 from sqlalchemy import or_
+from zoneinfo import ZoneInfo
 
 
 class VagaRepository:
@@ -77,21 +78,33 @@ class VagaRepository:
             )
 
         if periodo:
-            agora = datetime.now()
+            fuso_brasilia = ZoneInfo("America/Sao_Paulo")
+            agora = datetime.now(fuso_brasilia)
 
             if periodo == "hoje":
-                data_limite = datetime.combine(
+                inicio = datetime.combine(
                     agora.date(),
                     time.min,
                 )
-            elif periodo == "semana":
-                data_limite = agora - timedelta(days=7)
-            elif periodo == "mes":
-                data_limite = agora - timedelta(days=30)
-            else:
-                data_limite = None
+                fim = inicio + timedelta(days=1)
 
-            if data_limite:
+                query = query.filter(
+                    Vaga.data_publicacao >= inicio,
+                    Vaga.data_publicacao < fim,
+                )
+            elif periodo == "semana":
+                data_limite = (
+                    agora - timedelta(days=7)
+                ).replace(tzinfo=None)
+
+                query = query.filter(
+                    Vaga.data_publicacao >= data_limite
+                )
+            elif periodo == "mes":
+                data_limite = (
+                    agora - timedelta(days=30)
+                ).replace(tzinfo=None)
+
                 query = query.filter(
                     Vaga.data_publicacao >= data_limite
                 )
