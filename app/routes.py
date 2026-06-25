@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
-from app.services.coleta_service import ColetaService
+from app.services.coleta_runner import (
+    coleta_em_andamento,
+    iniciar_coleta,
+)
 from app.services.vaga_service import VagaService
 import hmac
 from flask import current_app
@@ -145,7 +148,14 @@ def executar_coleta():
             "erro": "Não autorizado."
         }), 401
 
-    service = ColetaService()
-    resultado = service.executar_coleta()
+    if coleta_em_andamento():
+        return jsonify({
+            "mensagem": "Já existe uma coleta em andamento."
+        }), 409
 
-    return jsonify(resultado)
+    app = current_app._get_current_object()
+    iniciar_coleta(app)
+
+    return jsonify({
+        "mensagem": "Coleta iniciada."
+    }), 202
