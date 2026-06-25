@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>CommitJobs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vagas.css') }}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a class="brand" href="{{ url_for('main.pagina_vagas') }}" aria-label="CommitJobs - página inicial">
+                <span class="brand-logo-frame" aria-hidden="true">
+                    <img
+                        src="{{ url_for('static', filename='images/logo-commitjobs.png') }}"
+                        alt=""
+                    >
+                </span>
+                <span class="brand-name">
+                    <strong>Commit</strong><span>Jobs</span>
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <form class="filters" method="get" action="{{ url_for('main.pagina_vagas') }}">
+            <div class="text-filter search-filter">
+                <label for="busca">Buscar vaga ou tecnologia</label>
+
+                <input
+                    id="busca"
+                    name="busca"
+                    type="search"
+                    placeholder="Ex.: Python, React, Java ou Full Stack"
+                    value="{{ filtros.busca or '' }}"
+                >
+            </div>
+
+            <div class="text-filter">
+                <label for="empresa">Empresa</label>
+
+                <input
+                    id="empresa"
+                    name="empresa"
+                    type="text"
+                    placeholder="Ex.: Nubank"
+                    value="{{ filtros.empresa or '' }}"
+                >
+            </div>
+
+            <div class="text-filter">
+                <label for="localizacao">Localização</label>
+
+                <input
+                    id="localizacao"
+                    name="localizacao"
+                    type="text"
+                    placeholder="Ex.: São Paulo"
+                    value="{{ filtros.localizacao or '' }}"
+                >
+            </div>
+
+            <div class="text-filter">
+                <label for="periodo">Data de publicação</label>
+
+                <select id="periodo" name="periodo">
+                    <option value="">Qualquer data</option>
+                    <option value="hoje" {% if filtros.periodo == "hoje" %}selected{% endif %}>
+                        Hoje
+                    </option>
+                    <option value="semana" {% if filtros.periodo == "semana" %}selected{% endif %}>
+                        Últimos 7 dias
+                    </option>
+                    <option value="mes" {% if filtros.periodo == "mes" %}selected{% endif %}>
+                        Últimos 30 dias
+                    </option>
+                </select>
+            </div>
+
+            <fieldset class="filter-group">
+                <legend>Nível</legend>
+
+                <div class="checkbox-options">
+                    {% for nivel in [
+                    "Estágio",
+                    "Júnior",
+                    "Júnior/Pleno",
+                    "Pleno",
+                    "Pleno/Sênior",
+                    "Sênior",
+                    "Não informado"
+                    ] %}
+                    <label class="checkbox-option">
+                        <input
+                            type="checkbox"
+                            name="nivel"
+                            value="{{ nivel }}"
+                            {% if nivel in (filtros.nivel or []) %}checked{% endif %}
+                        >
+                        <span>{{ nivel }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="filter-group">
+                <legend>Modalidade</legend>
+
+                <div class="checkbox-options">
+                    {% for modalidade in [
+                    "Remoto",
+                    "Híbrido",
+                    "Presencial"
+                    ] %}
+                    <label class="checkbox-option">
+                        <input
+                            type="checkbox"
+                            name="modalidade"
+                            value="{{ modalidade }}"
+                            {% if modalidade in (filtros.modalidade or []) %}checked{% endif %}
+                        >
+                        <span>{{ modalidade }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <div class="filter-actions">
+                <button type="submit">Aplicar filtros</button>
+
+                <a href="{{ url_for('main.pagina_vagas') }}">
+                    Limpar
+                </a>
+            </div>
+        </form>
+
+        <section class="results">
+            <div class="results-header">
+                <h2>
+                {{ paginacao.total }}
+                vaga{% if paginacao.total != 1 %}s{% endif %}
+                </h2>
+
+                <span class="page-summary">
+                    Página {{ paginacao.page }} de {{ paginacao.pages or 1 }}
+                </span>
+            </div>
+
+            {% if vagas %}
+            <div class="jobs-grid">
+            {% for vaga in vagas %}
+            <article class="job-card">
+                <div class="card-header">
+                    <div class="company-heading">
+                        <span class="company-avatar" aria-hidden="true">
+                            {{ (vaga.empresa or "?")[0] | upper }}
+                        </span>
+
+                        <p class="empresa">
+                            {{ vaga.empresa or "Empresa não informada" }}
+                        </p>
+                    </div>
+
+                    <span class="fonte">{{ vaga.fonte }}</span>
+                </div>
+
+                <h3>{{ vaga.titulo }}</h3>
+
+                <div class="job-meta">
+                    <p>
+                        <span class="meta-label">Local</span>
+                        <span>{{ vaga.localizacao or "Não informado" }}</span>
+                    </p>
+
+                    <p>
+                        <span class="meta-label">Modalidade</span>
+                        <span>{{ vaga.modalidade or "Não informada" }}</span>
+                    </p>
+
+                    <p>
+                        <span class="meta-label">Nível</span>
+                        <span>{{ vaga.nivel or "Não informado" }}</span>
+                    </p>
+
+                    <p>
+                        <span class="meta-label">Área</span>
+                        <span>
+                            {% if vaga.tecnologias %}
+                                {{ vaga.tecnologias | truncate(38) }}
+                            {% else %}
+                                Desenvolvimento
+                            {% endif %}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="card-footer">
+                    <p class="data-publicacao">
+                        Publicada em:
+                        {% if vaga.data_publicacao %}
+                            {{ vaga.data_publicacao.strftime("%d/%m/%Y") }}
+                        {% else %}
+                            Não informada
+                        {% endif %}
+                    </p>
+
+                    <a href="{{ vaga.link }}" target="_blank" rel="noopener noreferrer">
+                        Ver vaga
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+            </div>
+            {% else %}
+            <p>Nenhuma vaga encontrada.</p>
+            {% endif %}
+        </section>
+
+        {% if paginacao.pages > 1 %}
+        <nav aria-label="Paginação">
+            {% if paginacao.has_prev %}
+            <a href="{{
+                        url_for(
+                            'main.pagina_vagas',
+                            page=paginacao.prev_num,
+                            **filtros
+                        )
+                    }}">
+                Anterior
+            </a>
+            {% endif %}
+
+            <span>
+                Página {{ paginacao.page }}
+                de {{ paginacao.pages }}
+            </span>
+
+            {% if paginacao.has_next %}
+            <a href="{{
+                        url_for(
+                            'main.pagina_vagas',
+                            page=paginacao.next_num,
+                            **filtros
+                        )
+                    }}">
+                Próxima
+            </a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </main>
+</body>
+
+</html>
