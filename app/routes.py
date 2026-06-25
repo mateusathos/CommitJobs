@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from app.services.coleta_service import ColetaService
 from app.services.vaga_service import VagaService
 import hmac
@@ -10,7 +10,7 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.get("/")
 def index():
-    return jsonify({"mensagem": "Rastreador de vagas rodando!"})
+    return redirect(url_for("main.pagina_vagas"))
 
 
 @main_bp.get("/vagas")
