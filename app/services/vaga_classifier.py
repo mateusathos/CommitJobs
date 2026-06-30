@@ -1,14 +1,82 @@
+import re
 import unicodedata
 
-SOFTWARE_KEYWORDS = [
-    # Linguagens
+TITULOS_SOFTWARE = [
+    "desenvolvedor",
+    "desenvolvedora",
+    "developer",
+    "software developer",
+    "software engineer",
+    "engenheiro de software",
+    "engenheira de software",
+    "programador",
+    "programadora",
+    "backend",
+    "back-end",
+    "frontend",
+    "front-end",
+    "fullstack",
+    "full stack",
+    "firmware",
+    "sistemas embarcados",
+    "desenvolvimento de sistemas",
+    "desenvolvimento de software",
+    "analista de sistemas",
+    "analista desenvolvedor",
+    "analista de desenvolvimento",
+]
+
+TITULOS_SOFTWARE_MODERADOS = [
+    "devops",
+    "site reliability engineer",
+    "sre",
+    "qa automation",
+    "quality assurance automation",
+    "engenheiro de dados",
+    "engenheira de dados",
+    "data engineer",
+    "machine learning engineer",
+    "ml engineer",
+    "engenheiro de machine learning",
+    "engenheira de machine learning",
+    "arquiteto de software",
+    "arquiteta de software",
+    "tech lead",
+]
+
+TITULOS_EXCLUIDOS = [
+    "recruiter",
+    "tech recruiter",
+    "recrutador",
+    "recrutadora",
+    "recursos humanos",
+    "rh",
+    "pedagogico",
+    "pedagogica",
+    "professor",
+    "professora",
+    "instrutor",
+    "instrutora",
+    "projetista",
+    "business intelligence",
+    "bi analyst",
+    "analista de bi",
+    "power bi",
+    "suporte tecnico",
+    "help desk",
+    "service desk",
+    "infraestrutura",
+    "product manager",
+    "gerente de produto",
+    "product owner",
+    "scrum master",
+]
+
+TECNOLOGIAS_FORTES = [
     "python",
     "java",
     "javascript",
     "typescript",
-    "js",
-    "ts",
-    "c",
     "c++",
     "c#",
     "csharp",
@@ -22,18 +90,6 @@ SOFTWARE_KEYWORDS = [
     "dart",
     "scala",
     "rust",
-    "r",
-    "shell",
-    "bash",
-    "powershell",
-
-    # Front-end
-    "html",
-    "css",
-    "sass",
-    "scss",
-    "tailwind",
-    "bootstrap",
     "react",
     "reactjs",
     "react.js",
@@ -41,14 +97,10 @@ SOFTWARE_KEYWORDS = [
     "vue",
     "vuejs",
     "vue.js",
+    "svelte",
     "next.js",
     "nextjs",
     "nuxt",
-    "jquery",
-    "redux",
-    "vite",
-
-    # Back-end / Frameworks
     "node",
     "node.js",
     "nodejs",
@@ -59,32 +111,36 @@ SOFTWARE_KEYWORDS = [
     "django",
     "fastapi",
     "spring",
+    "spring boot",
     ".net",
     "dotnet",
     "dot net",
     "asp.net",
     "laravel",
     "rails",
+    "ruby on rails",
+    "react native",
+    "flutter",
+    "android",
+    "ios",
+]
 
-    # APIs / Arquitetura
-    "api",
-    "apis",
-    "rest",
-    "restful",
+TECNOLOGIAS_MODERADAS = [
+    "html",
+    "css",
+    "sass",
+    "scss",
+    "tailwind",
+    "bootstrap",
+    "jquery",
+    "redux",
+    "vite",
     "graphql",
     "microservices",
     "microsserviços",
+    "microsservicos",
     "web services",
-
-    # Mobile
-    "mobile",
-    "android",
-    "ios",
-    "react native",
-    "flutter",
     "xamarin",
-
-    # Banco de dados
     "sql",
     "postgresql",
     "postgres",
@@ -100,14 +156,9 @@ SOFTWARE_KEYWORDS = [
     "supabase",
     "elasticsearch",
     "dynamodb",
-
-    # DevOps / Cloud
     "docker",
     "kubernetes",
     "k8s",
-    "git",
-    "github",
-    "gitlab",
     "aws",
     "azure",
     "gcp",
@@ -117,12 +168,7 @@ SOFTWARE_KEYWORDS = [
     "gitlab ci",
     "ci/cd",
     "terraform",
-    "linux",
     "nginx",
-
-    # Testes / Qualidade
-    "testes",
-    "qa",
     "quality assurance",
     "selenium",
     "cypress",
@@ -131,98 +177,69 @@ SOFTWARE_KEYWORDS = [
     "junit",
     "unit tests",
     "testes unitários",
+    "testes unitarios",
     "testes automatizados",
-
-    # Dados / IA
-    "data science",
-    "ciência de dados",
-    "data analyst",
-    "analista de dados",
     "machine learning",
-    "inteligência artificial",
-    "ia",
     "pandas",
     "numpy",
     "pytorch",
     "tensorflow",
-    "power bi",
     "etl",
     "big data",
+    "airflow",
+    "spark",
+    "databricks",
+]
 
-    # Cargos
-    "dev",
-    "developer",
-    "software developer",
-    "software engineer",
-    "engenheiro de software",
-    "engenheira de software",
-    "desenvolvedor",
-    "desenvolvedora",
-    "programador",
-    "programadora",
-    "analista de sistemas",
-    "analista desenvolvedor",
-    "analista de desenvolvimento",
-    "estágio em desenvolvimento",
-    "estagiário de desenvolvimento",
-    "estagiária de desenvolvimento",
-    "estágio em ti",
-    "trainee desenvolvimento",
-    "trainee tecnologia",
-
-    # Áreas / Termos gerais
-    "backend",
-    "back-end",
-    "frontend",
-    "front-end",
-    "full stack",
-    "fullstack",
-    "desenvolvimento de software",
-    "engenharia de software",
+TERMOS_TECNICOS_FRACOS = [
+    "api",
+    "apis",
+    "rest",
+    "restful",
+    "git",
+    "github",
+    "gitlab",
+    "linux",
+    "shell",
+    "bash",
+    "powershell",
+    "qa",
+    "testes",
+    "mobile",
     "programação",
+    "programacao",
     "sistemas",
-    "sistemas de informação",
-    "análise e desenvolvimento de sistemas",
-    "ciência da computação",
-    "computação",
-    "tecnologia da informação",
-    "ti",
     "software",
     "web development",
     "desenvolvimento web",
+    "tecnologia da informação",
+    "tecnologia da informacao",
+]
+
+TERMOS_AREA_SOFTWARE = [
+    "dev",
+    "estágio em desenvolvimento",
+    "estagio em desenvolvimento",
+    "estagiário de desenvolvimento",
+    "estagiario de desenvolvimento",
+    "estagiária de desenvolvimento",
+    "estagiaria de desenvolvimento",
+    "estágio em ti",
+    "estagio em ti",
+    "trainee desenvolvimento",
+    "trainee tecnologia",
+    "sistemas de informação",
+    "sistemas de informacao",
+    "análise e desenvolvimento de sistemas",
+    "analise e desenvolvimento de sistemas",
+    "computação",
+    "computacao",
+    "ciência da computação",
+    "ciencia da computacao",
+    "engenharia de software",
     "desenvolvimento backend",
     "desenvolvimento frontend",
     "desenvolvimento full stack",
-]
-
-TITULOS_SOFTWARE = [
-    "desenvolvedor",
-    "desenvolvedora",
-    "developer",
-    "software engineer",
-    "programador",
-    "programadora",
-    "backend",
-    "back-end",
-    "frontend",
-    "front-end",
-    "fullstack",
-    "full stack",
-    "firmware",
-    "sistemas embarcados",
-    "desenvolvimento de sistemas",
-    "desenvolvimento de software",
-]
-
-TITULOS_EXCLUIDOS = [
-    "recruiter",
-    "recrutador",
-    "recrutadora",
-    "recursos humanos",
-    "pedagogico",
-    "pedagogica",
-    "projetista",
-    "business intelligence",
 ]
 
 def normalizar_texto(texto):
@@ -236,6 +253,17 @@ def normalizar_texto(texto):
     )
 
     return texto.lower()
+
+
+def contem_termo(texto, termo):
+    termo = normalizar_texto(termo)
+    padrao = rf"(?<![a-z0-9+#.]){re.escape(termo)}(?![a-z0-9+#.])"
+
+    return re.search(padrao, texto) is not None
+
+
+def contar_termos(texto, termos):
+    return sum(1 for termo in termos if contem_termo(texto, termo))
 
 
 def identificar_nivel(dados):
@@ -309,32 +337,43 @@ def identificar_nivel(dados):
 def vaga_eh_de_software(dados):
     titulo = normalizar_texto(dados.get("titulo"))
 
-    if any(termo in titulo for termo in TITULOS_EXCLUIDOS):
+    if any(contem_termo(titulo, termo) for termo in TITULOS_EXCLUIDOS):
         return False
 
-    if any(termo in titulo for termo in TITULOS_SOFTWARE):
+    if any(contem_termo(titulo, termo) for termo in TITULOS_SOFTWARE):
         return True
 
     texto_completo = normalizar_texto(
         " ".join([
+            dados.get("titulo") or "",
             dados.get("descricao") or "",
             dados.get("tecnologias") or "",
         ])
     )
 
-    tecnologias_encontradas = sum(
-        1
-        for termo in SOFTWARE_KEYWORDS
-        if termo in texto_completo
-    )
+    score = 0
+    score += contar_termos(titulo, TITULOS_SOFTWARE_MODERADOS) * 3
+    score += contar_termos(texto_completo, TECNOLOGIAS_FORTES) * 2
+    score += contar_termos(texto_completo, TECNOLOGIAS_MODERADAS)
+    score += contar_termos(texto_completo, TERMOS_TECNICOS_FRACOS)
+    score += contar_termos(texto_completo, TERMOS_AREA_SOFTWARE) * 2
 
-    titulo_generico_valido = any(termo in titulo for termo in [
+    titulo_generico_valido = any(contem_termo(titulo, termo) for termo in [
         "estagio",
         "estagiario",
         "estagiaria",
         "analista",
         "engenheiro",
         "engenheira",
+        "assistente",
+        "auxiliar",
+        "consultor",
+        "consultora",
+        "especialista",
+        "trainee",
     ])
 
-    return titulo_generico_valido and tecnologias_encontradas >= 2
+    if titulo_generico_valido:
+        return score >= 3
+
+    return score >= 5

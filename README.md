@@ -44,6 +44,19 @@ O sistema trabalha com vagas de diferentes níveis de senioridade, modalidades e
 
 Cada fonte é adaptada para um formato interno comum antes de passar pelas regras de classificação e persistência.
 
+## Classificação
+
+O CommitJobs utiliza uma camada de classificação heurística para decidir se uma vaga pertence ao contexto de desenvolvimento de software.
+
+A classificação considera sinais como:
+
+- termos fortes no título, como `desenvolvedor`, `software engineer`, `backend`, `frontend` e `full stack`;
+- cargos técnicos relacionados, como `DevOps`, `QA Automation`, `Data Engineer` e `Tech Lead`;
+- tecnologias citadas no título, descrição ou tags, como `Python`, `Java`, `React`, `Node.js`, `.NET`, `Docker`, `PostgreSQL` e `AWS`;
+- termos de exclusão para reduzir falsos positivos, como `Tech Recruiter`, `Business Intelligence`, `Help Desk`, `Product Owner` e `Scrum Master`.
+
+O classificador usa um sistema de pontuação ponderada: sinais mais fortes recebem maior peso, enquanto termos genéricos contam menos. Essa abordagem mantém o comportamento previsível, auditável e simples de ajustar conforme novas vagas são coletadas.
+
 ## Arquitetura
 
 ```mermaid
