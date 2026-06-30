@@ -54,6 +54,30 @@ class ColetaService:
                 max_pages=200,
                 max_age_days=90,
             ),
+            GupyCollector(
+                query="dev",
+                limit=50,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            GupyCollector(
+                query="ti",
+                limit=50,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            GupyCollector(
+                query="tecnologia",
+                limit=50,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            GupyCollector(
+                query="tech",
+                limit=50,
+                max_pages=200,
+                max_age_days=90,
+            ),
 
 
             SolidesCollector(
@@ -88,6 +112,24 @@ class ColetaService:
             ),
             SolidesCollector(
                 query="fullstack",
+                take=14,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            SolidesCollector(
+                query="ti",
+                take=14,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            SolidesCollector(
+                query="tecnologia",
+                take=14,
+                max_pages=200,
+                max_age_days=90,
+            ),
+            SolidesCollector(
+                query="tech",
                 take=14,
                 max_pages=200,
                 max_age_days=90,
@@ -137,6 +179,14 @@ class ColetaService:
             ),
             JoobleCollector(
                 query="programador",
+                api_key=jooble_api_key,
+                location="Brasil",
+                results_per_page=100,
+                max_pages=5,
+                max_age_days=90,
+            ),
+            JoobleCollector(
+                query="dev",
                 api_key=jooble_api_key,
                 location="Brasil",
                 results_per_page=100,
